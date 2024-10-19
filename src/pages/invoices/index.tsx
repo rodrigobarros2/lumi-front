@@ -8,28 +8,54 @@ import { ExtractInvoiceModal } from "./modal";
 import { Header } from "@/components/Header";
 import { getAllInvoices } from "@/modules/invoices";
 
+// Definindo a estrutura de Invoice real
 type Invoice = {
   id: string;
   ucName: string;
   ucNumber: string;
   distributor: string;
   consumer: string;
-  months: Record<string, boolean>;
+  months: Record<string, boolean>; // Meses e se a fatura está disponível
+  invoiceUrl: string | null;
+  invoiceName: string | null;
 };
 
+// Meses para mapear as faturas
 const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 export function Invoices() {
   const [filter, setFilter] = useState("");
-  const [year, setYear] = useState("2019");
-  const [invoices2, setInvoices] = useState<Invoice[]>([]);
-  console.log("🚀 ~ Invoices ~ invoices2:", invoices2);
+  const [year, setYear] = useState("2024");
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  // Função para mapear os meses de acordo com as faturas reais
+  const mapInvoicesToMonths = (invoicesData: any[]) => {
+    return invoicesData.map((invoice) => {
+      // Criando um objeto para mapear quais meses têm faturas
+      const monthsAvailability = months.reduce((acc, month) => {
+        acc[month] = invoice.invoiceMonth.includes(month);
+        return acc;
+      }, {} as Record<string, boolean>);
+
+      return {
+        id: invoice.id,
+        ucName: invoice.consumer,
+        ucNumber: invoice.clientNumber.toString(),
+        distributor: invoice.distributor,
+        consumer: invoice.consumer,
+        months: monthsAvailability,
+        invoiceUrl: invoice.invoiceUrl,
+        invoiceName: invoice.invoiceName,
+      };
+    });
+  };
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await getAllInvoices();
-        setInvoices(response);
+        const response = await getAllInvoices(); // Obtendo os dados da API
+        const mappedInvoices = mapInvoicesToMonths(response.data); // Mapeando os dados para os meses
+        setInvoices(mappedInvoices);
       } catch (error) {
         console.error("Erro ao buscar faturas:", error);
       }
@@ -38,51 +64,7 @@ export function Invoices() {
     fetchInvoices();
   }, []);
 
-  const invoices: Invoice[] = [
-    {
-      id: "1",
-      ucName: "CASA DONA COMERCIO VAREJISTA E SOLUÇ...",
-      ucNumber: "3002865313",
-      distributor: "CEMIG",
-      consumer: "CASA DONA COMERCIO VAR...",
-      months: {
-        Jan: true,
-        Fev: true,
-        Mar: true,
-        Abr: true,
-        Mai: true,
-        Jun: true,
-        Jul: true,
-        Ago: true,
-        Set: true,
-        Out: true,
-        Nov: true,
-        Dez: true,
-      },
-    },
-    {
-      id: "2",
-      ucName: "Walter Boaventura da Silva",
-      ucNumber: "3003336712",
-      distributor: "CEMIG",
-      consumer: "Walter Boaventura da Silva",
-      months: {
-        Jan: true,
-        Fev: true,
-        Mar: false,
-        Abr: true,
-        Mai: true,
-        Jun: true,
-        Jul: true,
-        Ago: true,
-        Set: true,
-        Out: true,
-        Nov: true,
-        Dez: true,
-      },
-    },
-  ];
-
+  // Filtrando as faturas pelo número ou nome do cliente
   const filteredInvoices = invoices.filter(
     (invoice) => invoice.ucNumber.includes(filter) || invoice.ucName.toLowerCase().includes(filter.toLowerCase())
   );
@@ -105,9 +87,9 @@ export function Invoices() {
             <SelectValue placeholder="Selecione o ano" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="2019">2019</SelectItem>
-            <SelectItem value="2020">2020</SelectItem>
-            <SelectItem value="2021">2021</SelectItem>
+            <SelectItem value="2024">2024</SelectItem>
+            <SelectItem value="2023">2023</SelectItem>
+            <SelectItem value="2022">2022</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -135,14 +117,22 @@ export function Invoices() {
                 <TableCell>{invoice.consumer}</TableCell>
                 {months.map((month) => (
                   <TableCell key={month} className="text-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={!invoice.months[month] ? "opacity-50 cursor-not-allowed" : ""}
-                      disabled={!invoice.months[month]}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
+                    {invoice.months[month] ? (
+                      <Button variant="ghost" size="sm">
+                        <a
+                          href={invoice.invoiceUrl ?? "#"}
+                          download={invoice.invoiceName ?? ""}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" size="sm" className="opacity-50 cursor-not-allowed" disabled>
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    )}
                   </TableCell>
                 ))}
               </TableRow>
