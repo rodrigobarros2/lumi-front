@@ -12,7 +12,7 @@ export const createInvoice = async (invoiceData: FormData) => {
     toast.success("PDF cadastrado com sucesso!");
     return data;
   } catch (error) {
-    toast.success("Erro ao cadastrado Pdf!");
+    toast.error("Erro ao cadastrado Pdf!");
     console.error("Error creating invoice:", error);
     throw error;
   }

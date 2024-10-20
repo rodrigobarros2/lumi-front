@@ -1,61 +1,47 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download } from "lucide-react";
 import { ExtractInvoiceModal } from "./modal";
 import { Header } from "@/components/Header";
-import { getAllInvoices } from "@/modules/invoices";
+import { downloadInvoicePdf, getAllInvoices } from "@/modules/invoices";
+import { Download } from "lucide-react";
 
-// Definindo a estrutura de Invoice real
 type Invoice = {
   id: string;
-  ucName: string;
-  ucNumber: string;
-  distributor: string;
   consumer: string;
-  months: Record<string, boolean>; // Meses e se a fatura está disponível
-  invoiceUrl: string | null;
-  invoiceName: string | null;
+  distributor: string;
+  invoiceMonth: string;
+  installationNumber: string;
+  clientNumber: string;
+  energyValue: string;
+  energyQuantity: string;
+  sceeeValue: string;
+  sceeeQuantity: string;
+  compensatedValue: string;
+  compensatedQuantity: string;
+  publicLighting: string;
+  invoiceUrl: string;
+  invoiceName: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-// Meses para mapear as faturas
-const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+const months = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
 export function Invoices() {
-  const [filter, setFilter] = useState("");
-  const [year, setYear] = useState("2024");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-
-  // Função para mapear os meses de acordo com as faturas reais
-  const mapInvoicesToMonths = (invoicesData: any[]) => {
-    return invoicesData.map((invoice) => {
-      // Criando um objeto para mapear quais meses têm faturas
-      const monthsAvailability = months.reduce((acc, month) => {
-        acc[month] = invoice.invoiceMonth.includes(month);
-        return acc;
-      }, {} as Record<string, boolean>);
-
-      return {
-        id: invoice.id,
-        ucName: invoice.consumer,
-        ucNumber: invoice.clientNumber.toString(),
-        distributor: invoice.distributor,
-        consumer: invoice.consumer,
-        months: monthsAvailability,
-        invoiceUrl: invoice.invoiceUrl,
-        invoiceName: invoice.invoiceName,
-      };
-    });
-  };
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
+  const [filter, setFilter] = useState("");
+  const [year, setYear] = useState<string>("2024");
 
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const response = await getAllInvoices(); // Obtendo os dados da API
-        const mappedInvoices = mapInvoicesToMonths(response.data); // Mapeando os dados para os meses
-        setInvoices(mappedInvoices);
+        const response = await getAllInvoices();
+        const data = response.data as Invoice[];
+        setInvoices(data);
+        setFilteredInvoices(filterByYear(data, year));
       } catch (error) {
         console.error("Erro ao buscar faturas:", error);
       }
@@ -64,10 +50,17 @@ export function Invoices() {
     fetchInvoices();
   }, []);
 
-  // Filtrando as faturas pelo número ou nome do cliente
-  const filteredInvoices = invoices.filter(
-    (invoice) => invoice.ucNumber.includes(filter) || invoice.ucName.toLowerCase().includes(filter.toLowerCase())
-  );
+  useEffect(() => {
+    setFilteredInvoices(filterByYear(invoices, year));
+  }, [year, filter, invoices]);
+
+  const filterByYear = (invoices: Invoice[], year: string) => {
+    return invoices.filter(
+      (invoice) =>
+        invoice.createdAt.includes(year) &&
+        (invoice.consumer.toLowerCase().includes(filter.toLowerCase()) || invoice.clientNumber.includes(filter))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -97,10 +90,9 @@ export function Invoices() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome da UC</TableHead>
-              <TableHead>Número da UC</TableHead>
+              <TableHead>Nome do Consumidor</TableHead>
+              <TableHead className="whitespace-nowrap">Número da Instalação</TableHead>
               <TableHead>Distribuidora</TableHead>
-              <TableHead>Consumidor</TableHead>
               {months.map((month) => (
                 <TableHead key={month} className="text-center">
                   {month}
@@ -111,27 +103,15 @@ export function Invoices() {
           <TableBody>
             {filteredInvoices.map((invoice) => (
               <TableRow key={invoice.id}>
-                <TableCell className="font-medium">{invoice.ucName}</TableCell>
-                <TableCell>{invoice.ucNumber}</TableCell>
+                <TableCell className="font-medium">{invoice.consumer}</TableCell>
+                <TableCell>{invoice.installationNumber}</TableCell>
                 <TableCell>{invoice.distributor}</TableCell>
-                <TableCell>{invoice.consumer}</TableCell>
                 {months.map((month) => (
                   <TableCell key={month} className="text-center">
-                    {invoice.months[month] ? (
-                      <Button variant="ghost" size="sm">
-                        <a
-                          href={invoice.invoiceUrl ?? "#"}
-                          download={invoice.invoiceName ?? ""}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Download className="h-4 w-4" />
-                        </a>
-                      </Button>
+                    {invoice.invoiceMonth.includes(month) ? (
+                      <Download className="h-4 w-4 cursor-pointer" onClick={() => downloadInvoicePdf(invoice.id)} />
                     ) : (
-                      <Button variant="ghost" size="sm" className="opacity-50 cursor-not-allowed" disabled>
-                        <Download className="h-4 w-4" />
-                      </Button>
+                      <Download className="h-4 w-4 text-gray-400" />
                     )}
                   </TableCell>
                 ))}

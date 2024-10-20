@@ -39,14 +39,14 @@ export const usePDF = () => {
     const sceeEnergyIdx = data.findIndex((item) => item.startsWith("Energia SCEE"));
     const compensatedEnergyIdx = data.findIndex((item) => item.startsWith("Energia compensada"));
     const contribIdx = data.findIndex((item) => item === "Contrib Ilum Publica Municipal");
-    const consumerIdx = data.findIndex((item) => item === "Total a pagar");
+    const consumerIdx = data.findIndex((item) => item.includes("CNPJ"));
     const installationNumberIdx = data.findIndex((item) => item === "Nº DA INSTALAÇÃO");
-    const distributorIdx = data.findIndex((item) => item === "SEGUNDA VIA");
+    const distributorIdx = data.findIndex((item) => item.includes("CEP"));
 
     return {
-      distributor: getValue(distributorIdx),
+      distributor: getValue(distributorIdx, -2),
       installationNumber: getValue(installationNumberIdx),
-      consumer: getValue(consumerIdx, 7).replace(/\d+/g, "").trim(),
+      consumer: getValue(consumerIdx, -4),
       clientNumber: getValue(clientNumberIdx, 2),
       invoiceMonth: getValue(dateReferenceIdx, 3),
       publicLighting: getValue(contribIdx),
