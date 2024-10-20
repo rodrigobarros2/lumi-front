@@ -28,7 +28,17 @@ export const getAllInvoices = async () => {
   }
 };
 
-export const getInvoiceById = async (id: string) => {
+export const getByClientNumber = async (id: number) => {
+  try {
+    const { data } = await http.get(`/invoices/${id}/client`);
+    return data;
+  } catch (error) {
+    console.error(`Error fetching invoice with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getById = async (id: number) => {
   try {
     const { data } = await http.get(`/invoices/${id}`);
     return data;

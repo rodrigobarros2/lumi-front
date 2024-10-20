@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { createInvoice } from "@/modules/invoices";
-import { InvoiceFormInputs } from "./invoices.types";
+import { createInvoice, getAllInvoices } from "@/modules/invoices";
 import { usePDF } from "./usePDF";
-import { toast } from "@/hooks/use-toast";
+import { InvoiceFormInputs } from "@/types/types";
 
-export function ExtractInvoiceModal() {
+export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const {
     register,
@@ -43,10 +42,13 @@ export function ExtractInvoiceModal() {
     try {
       const response = await createInvoice(formData);
       console.log("Fatura cadastrada com sucesso:", response);
-      reset(); // Limpar os inputs após o cadastro bem-sucedido
-      setIsOpen(false); // Fechar o modal após o cadastro bem-sucedido
+      reset();
+      setIsOpen(false);
     } catch (error) {
       console.error("Erro ao cadastrar fatura:", error);
+    } finally {
+      await getAllInvoices();
+      onClose();
     }
   };
 
@@ -72,8 +74,8 @@ export function ExtractInvoiceModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary text-background mr-3" onClick={() => setIsOpen(true)}>
-          <Plus className="mr-2 h-4 w-4 text-background" /> Extrair PDF
+        <Button className="bg-primary text-white mr-3" onClick={() => setIsOpen(true)}>
+          <Plus className="mr-2 h-4 w-4 text-white" /> Extrair PDF
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] rounded-lg">
@@ -237,7 +239,7 @@ export function ExtractInvoiceModal() {
                 type="file"
                 accept="application/pdf"
                 {...register("pdfFile", { required: "Este campo é obrigatório" })}
-                className="rounded-md"
+                className="rounded-md cursor-pointer"
                 onChange={handlePdfUpload}
               />
               {errors.pdfFile && <p className="text-red-500 text-sm">{errors.pdfFile.message}</p>}

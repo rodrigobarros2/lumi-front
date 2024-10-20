@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as pdfjs from "pdfjs-dist";
 pdfjs.GlobalWorkerOptions.workerSrc = "../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs";
 
@@ -46,7 +47,7 @@ export const usePDF = () => {
     return {
       distributor: getValue(distributorIdx, -2),
       installationNumber: getValue(installationNumberIdx),
-      consumer: getValue(consumerIdx, -4),
+      consumer: getValue(consumerIdx, -4).replace(/\d+/g, "").trim(),
       clientNumber: getValue(clientNumberIdx, 2),
       invoiceMonth: getValue(dateReferenceIdx, 3),
       publicLighting: getValue(contribIdx),

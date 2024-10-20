@@ -1,85 +1,105 @@
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Header } from "@/components/Header";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
+import { getAllInvoices, getByClientNumber } from "@/modules/invoices";
+import { INITIAL_ENERGY_DATA, INITIAL_MONETARY_DATA, processInvoiceData } from "@/utils/invoiceUtils";
+import { Invoice } from "@/types/types";
+import { chartConfig } from "@/utils/chartConfig";
 
 export function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedClient, setSelectedClient] = useState<string>("");
+  const [clients, setClients] = useState<string[]>([]);
+  const [energyData, setEnergyData] = useState(INITIAL_ENERGY_DATA);
+  const [monetaryData, setMonetaryData] = useState(INITIAL_MONETARY_DATA);
+  const [totalEnergy, setTotalEnergy] = useState<number>(0);
+  const [totalCompensated, setTotalCompensated] = useState<number>(0);
+  const [totalWithoutGD, setTotalWithoutGD] = useState<number>(0);
+  const [totalEconomyGD, setTotalEconomyGD] = useState<number>(0);
 
-  const energyData = [
-    { month: "Jan", consumo: 300, compensada: -250 },
-    { month: "Fev", consumo: 280, compensada: -220 },
-    { month: "Mar", consumo: 310, compensada: 240 },
-    { month: "Abr", consumo: 290, compensada: 230 },
-    { month: "Mai", consumo: 320, compensada: 260 },
-    { month: "Jun", consumo: 300, compensada: 240 },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const allInvoicesResponse = await getAllInvoices();
+        const allInvoices = allInvoicesResponse.data as Invoice[];
+        const uniqueClients = Array.from(new Set(allInvoices.map((invoice) => invoice.clientNumber)));
+        setClients(uniqueClients);
 
-  const monetaryData = [
-    { month: "Jan", consumo: 150, compensada: 120 },
-    { month: "Fev", consumo: 140, compensada: 110 },
-    { month: "Mar", consumo: 155, compensada: 125 },
-    { month: "Abr", consumo: 145, compensada: 115 },
-    { month: "Mai", consumo: 160, compensada: 130 },
-    { month: "Jun", consumo: 150, compensada: 120 },
-  ];
+        if (selectedClient) {
+          const clientInvoicesResponse = await getByClientNumber(Number(selectedClient));
+          const clientInvoices = clientInvoicesResponse.data as Invoice[];
+          processInvoiceData(
+            clientInvoices,
+            setEnergyData,
+            setMonetaryData,
+            setTotalEnergy,
+            setTotalCompensated,
+            setTotalWithoutGD,
+            setTotalEconomyGD
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
+    };
 
-  const chartConfig = {
-    desktop: {
-      label: "Desktop",
-      color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-      label: "Mobile",
-      color: "hsl(var(--chart-2))",
-    },
-  } satisfies ChartConfig;
+    fetchData();
+  }, [selectedClient]);
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
       <Header />
-
       <main>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Dashboard</h2>
+
           <div className="relative">
-            <Input
-              type="text"
-              placeholder="Pesquisar por numero do cliente..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-64 pl-10"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Select value={selectedClient} onValueChange={setSelectedClient}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Selecione um número do cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                {clients.map((clientNumber) => (
+                  <SelectItem key={clientNumber} value={clientNumber}>
+                    {clientNumber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4">
-              <p className="text-sm text-muted-foreground">Consumo Energia Elétrica</p>
-              <p className="text-2xl font-bold">R$ 506,00</p>
+              <p className="text-sm text-muted-foreground">Consumo de Energia Elétrica</p>
+              <div>
+                <span className="text-2xl font-bold">{totalEnergy}</span>
+                <span> kWh</span>
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Energia Compensada</p>
-              <p className="text-2xl font-bold">R$ 456,00</p>
+              <div>
+                <span className="text-2xl font-bold">{totalCompensated}</span>
+                <span> kWh</span>
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Valor Total sem GD</p>
-              <p className="text-2xl font-bold">R$ 329,17</p>
+              <p className="text-2xl font-bold">R$ {totalWithoutGD.toFixed(2)}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-muted-foreground">Economia GD</p>
-              <p className="text-2xl font-bold text-destructive">-R$ 222,22</p>
+              <p className="text-2xl font-bold">R$ {totalEconomyGD.toFixed(2)}</p>
             </CardContent>
           </Card>
         </div>
@@ -98,8 +118,8 @@ export function Home() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="consumo" fill="hsl(var(--chart-1))" name="Consumo" />
-                    <Bar dataKey="compensada" fill="hsl(var(--chart-2))" name="Compensada" />
+                    <Bar dataKey="consumo" fill="hsl(var(--chart-1))" name="Consumo de Energia Elétrica (kWh)" />
+                    <Bar dataKey="compensada" fill="hsl(var(--chart-2))" name="Energia Compensada (kWh)" />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
@@ -118,8 +138,8 @@ export function Home() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="consumo" fill="hsl(var(--chart-1))" name="Consumo" />
-                    <Bar dataKey="compensada" fill="hsl(var(--chart-2))" name="Compensada" />
+                    <Bar dataKey="consumo" fill="hsl(var(--chart-1))" name="Valor Total sem GD (R$)" />
+                    <Bar dataKey="compensada" fill="hsl(var(--chart-2))" name="Economia GD (R$)" />
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
