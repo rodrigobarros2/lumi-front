@@ -66,7 +66,7 @@ export function Invoices() {
       {filteredInvoices.length > 0 ? (
         <InvoiceTable invoices={invoices} filteredInvoices={filteredInvoices} />
       ) : (
-        <div className="text-center text-gray-500">Nenhuma fatura encontrada para o ano selecionado.</div>
+        <h1 className="text-center text-gray-500">Nenhuma fatura encontrada</h1>
       )}
     </div>
   );
