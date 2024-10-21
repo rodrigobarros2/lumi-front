@@ -8,6 +8,29 @@ const months = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "
 export function InvoiceTable({ invoices, filteredInvoices }: { invoices: Invoice[]; filteredInvoices: Invoice[] }) {
   const dataToDisplay = filteredInvoices.length > 0 ? filteredInvoices : invoices;
 
+  const extractMonth = (invoiceMonth: string) => invoiceMonth.split("/")[0];
+
+  const groupedInvoices = dataToDisplay.reduce((acc, invoice) => {
+    const { installationNumber, invoiceMonth, id } = invoice;
+    const month = extractMonth(invoiceMonth);
+    const existingInvoice = acc[installationNumber];
+
+    if (existingInvoice) {
+      existingInvoice.invoiceMonths = [...new Set([...existingInvoice.invoiceMonths, month])];
+      existingInvoice.invoiceIds = [...new Set([...existingInvoice.invoiceIds, id])];
+    } else {
+      acc[installationNumber] = {
+        consumer: invoice.consumer,
+        installationNumber,
+        distributor: invoice.distributor,
+        invoiceMonths: [month],
+        invoiceIds: [id],
+      };
+    }
+
+    return acc;
+  }, {} as Record<string, { consumer: string; installationNumber: string; distributor: string; invoiceMonths: string[]; invoiceIds: string[] }>);
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -24,17 +47,17 @@ export function InvoiceTable({ invoices, filteredInvoices }: { invoices: Invoice
           </TableRow>
         </TableHeader>
         <TableBody>
-          {dataToDisplay.map((invoice) => (
-            <TableRow key={invoice.id}>
-              <TableCell className="font-medium">{invoice.consumer}</TableCell>
-              <TableCell>{invoice.installationNumber}</TableCell>
-              <TableCell>{invoice.distributor}</TableCell>
+          {Object.values(groupedInvoices).map((groupedInvoice) => (
+            <TableRow key={groupedInvoice.installationNumber}>
+              <TableCell className="font-medium">{groupedInvoice.consumer}</TableCell>
+              <TableCell>{groupedInvoice.installationNumber}</TableCell>
+              <TableCell>{groupedInvoice.distributor}</TableCell>
               {months.map((month) => (
                 <TableCell key={month} className="text-center">
-                  {invoice.invoiceMonth.includes(month) ? (
+                  {groupedInvoice.invoiceMonths.includes(month) ? (
                     <Download
                       className="h-4 w-4 cursor-pointer text-primary"
-                      onClick={() => downloadInvoicePdf(invoice.id)}
+                      onClick={() => downloadInvoicePdf(groupedInvoice.invoiceIds[0])}
                     />
                   ) : (
                     <Download className="h-4 w-4 text-gray-400" />
