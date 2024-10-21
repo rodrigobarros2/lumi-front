@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { usePdf } from "./ausePdf"; // Ajuste o caminho conforme necessário
+import { usePdf } from "./usePdf"; // Ajuste o caminho conforme necessário
 import * as pdfjs from "pdfjs-dist";
 
 vi.mock("pdfjs-dist", async (importOriginal) => {
