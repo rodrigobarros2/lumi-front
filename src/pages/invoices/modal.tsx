@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { createInvoice, getAllInvoices } from "@/modules/invoices";
 import { InvoiceFormInputs } from "@/types/types";
-import { usePdf } from "./usePDF";
+import { usePdf } from "./ausePdf";
 
 export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
