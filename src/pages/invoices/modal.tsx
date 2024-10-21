@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { createInvoice, getAllInvoices } from "@/modules/invoices";
 import { InvoiceFormInputs } from "@/types/types";
 import { usePdf } from "./usePdf";
-console.log("🚀 ~ usePdf:", usePdf)
 
 export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
