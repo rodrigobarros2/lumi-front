@@ -9,7 +9,7 @@ export const createInvoice = async (invoiceData: FormData) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    toast.success("PDF cadastrado com sucesso!");
+    toast.success(data.message);
     return data;
   } catch (error) {
     toast.error("Erro ao cadastrado Pdf!");
