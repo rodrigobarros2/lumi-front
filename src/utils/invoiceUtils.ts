@@ -30,15 +30,7 @@ export const INITIAL_MONETARY_DATA = [
   { month: "DEZ", consumo: 0, compensada: 0 },
 ];
 
-export const processInvoiceData = (
-  invoices: Invoice[],
-  setEnergyData: React.Dispatch<React.SetStateAction<typeof INITIAL_ENERGY_DATA>>,
-  setMonetaryData: React.Dispatch<React.SetStateAction<typeof INITIAL_MONETARY_DATA>>,
-  setTotalEnergy: React.Dispatch<React.SetStateAction<number>>,
-  setTotalCompensated: React.Dispatch<React.SetStateAction<number>>,
-  setTotalWithoutGD: React.Dispatch<React.SetStateAction<number>>,
-  setTotalEconomyGD: React.Dispatch<React.SetStateAction<number>>
-) => {
+export const calculateInvoiceData = (invoices: Invoice[]) => {
   const energyData = INITIAL_ENERGY_DATA.map((data) => ({ ...data }));
   const monetaryData = INITIAL_MONETARY_DATA.map((data) => ({ ...data }));
 
@@ -48,7 +40,7 @@ export const processInvoiceData = (
   let totalEconomyGD = 0;
 
   invoices.forEach((invoice) => {
-    const month = invoice.invoiceMonth.split("/")[0];
+    const month = invoice.invoiceMonth.split("/")[0].toUpperCase();
     const monthIndex = energyData.findIndex((data) => data.month === month);
 
     if (monthIndex !== -1) {
@@ -64,6 +56,34 @@ export const processInvoiceData = (
       totalEconomyGD += Number(invoice.compensatedValue);
     }
   });
+
+  return {
+    energyData,
+    monetaryData,
+    totalEnergy,
+    totalCompensated,
+    totalWithoutGD,
+    totalEconomyGD,
+  };
+};
+
+export const processInvoiceData = (
+  invoices: Invoice[],
+  setEnergyData: React.Dispatch<React.SetStateAction<typeof INITIAL_ENERGY_DATA>>,
+  setMonetaryData: React.Dispatch<React.SetStateAction<typeof INITIAL_MONETARY_DATA>>,
+  setTotalEnergy: React.Dispatch<React.SetStateAction<number>>,
+  setTotalCompensated: React.Dispatch<React.SetStateAction<number>>,
+  setTotalWithoutGD: React.Dispatch<React.SetStateAction<number>>,
+  setTotalEconomyGD: React.Dispatch<React.SetStateAction<number>>
+) => {
+  const {
+    energyData,
+    monetaryData,
+    totalEnergy,
+    totalCompensated,
+    totalWithoutGD,
+    totalEconomyGD,
+  } = calculateInvoiceData(invoices);
 
   setEnergyData(energyData);
   setMonetaryData(monetaryData);
