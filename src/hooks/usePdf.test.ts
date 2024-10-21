@@ -1,7 +1,7 @@
-import { extractTextFromFile } from "./usePdf";
 import * as pdfjs from "pdfjs-dist";
 import fs from "fs";
 import path from "path";
+import { extractTextFromFile } from "@/hooks/usePdf";
 
 // Configurar o workerSrc
 pdfjs.GlobalWorkerOptions.workerSrc =
