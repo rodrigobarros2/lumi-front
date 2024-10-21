@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { downloadInvoicePdf } from "@/modules/invoices";
 import { Invoice } from "@/types/types";
-import { Download } from "lucide-react";
+import { FileText } from "lucide-react";
 
 const months = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
 
@@ -55,12 +55,12 @@ export function InvoiceTable({ invoices, filteredInvoices }: { invoices: Invoice
               {months.map((month) => (
                 <TableCell key={month} className="text-center">
                   {groupedInvoice.invoiceMonths.includes(month) ? (
-                    <Download
-                      className="h-4 w-4 cursor-pointer text-primary"
+                    <FileText
+                      className="h-5 w-5 cursor-pointer text-primary"
                       onClick={() => downloadInvoicePdf(groupedInvoice.invoiceIds[0])}
                     />
                   ) : (
-                    <Download className="h-4 w-4 text-gray-400" />
+                    <FileText className="h-5 w-5 text-gray-400" />
                   )}
                 </TableCell>
               ))}
