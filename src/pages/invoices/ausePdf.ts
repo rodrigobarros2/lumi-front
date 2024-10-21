@@ -17,7 +17,7 @@ interface ExtractedData {
   compensatedQuantity: string;
 }
 
-export const usePDF = () => {
+export const usePdf = () => {
   const extractTextFromFile = async (pdf: File): Promise<ExtractedData> => {
     const fileBuffer = new Uint8Array(await pdf.arrayBuffer());
     const file = await pdfjs.getDocument(fileBuffer).promise;

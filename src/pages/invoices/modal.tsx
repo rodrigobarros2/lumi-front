@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { createInvoice, getAllInvoices } from "@/modules/invoices";
-import { usePDF } from "./usePDF";
 import { InvoiceFormInputs } from "@/types/types";
+import { usePdf } from "./usePDF";
 
 export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,7 @@ export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
     reset,
     formState: { errors },
   } = useForm<InvoiceFormInputs>();
-  const { extractTextFromFile } = usePDF();
+  const { extractTextFromFile } = usePdf();
 
   const onSubmit: SubmitHandler<InvoiceFormInputs> = async (data) => {
     const formData = new FormData();
