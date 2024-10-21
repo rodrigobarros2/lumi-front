@@ -1,17 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ExtractInvoiceModal } from "./modal";
 import { Header } from "@/components/Header";
 import { getAllInvoices } from "@/modules/invoices";
 import { InvoiceTable } from "./invoiceTable";
 import { Invoice } from "@/types/types";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [filter, setFilter] = useState("");
   const [year, setYear] = useState<string>("2024");
+
+  const debouncedFilter = useDebounce(filter, 500);
 
   const fetchAndFilterInvoices = useCallback(async () => {
     try {
@@ -21,19 +30,21 @@ export function Invoices() {
       const filtered = data.filter(
         (invoice) =>
           new Date(invoice.createdAt).getFullYear().toString() === year &&
-          (invoice.consumer.toLowerCase().includes(filter.toLowerCase()) ||
-            String(invoice.clientNumber).includes(filter))
+          (invoice.consumer
+            .toLowerCase()
+            .includes(debouncedFilter.toLowerCase()) ||
+            String(invoice.clientNumber).includes(debouncedFilter))
       );
       setInvoices(data);
       setFilteredInvoices(filtered);
     } catch (error) {
       console.error("Erro ao buscar faturas:", error);
     }
-  }, [year, filter]);
+  }, [year, debouncedFilter]);
 
   useEffect(() => {
     fetchAndFilterInvoices();
-  }, [year, filter, fetchAndFilterInvoices]);
+  }, [year, debouncedFilter, fetchAndFilterInvoices]);
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
