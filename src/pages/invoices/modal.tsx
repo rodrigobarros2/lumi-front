@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -83,6 +83,21 @@ export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
           <DialogTitle>Extrair Fatura</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+          <div className="w-full">
+            <Button type="button" variant={"outline"} className="gap-2 w-full cursor-pointer" asChild>
+              <Label htmlFor="pdfFile" className="w-full">
+                <Input
+                  id="pdfFile"
+                  className="hidden w-full"
+                  type="file"
+                  accept="application/pdf"
+                  {...register("pdfFile", { onChange: handlePdfUpload })}
+                />
+                <Upload className="w-4 h-4" /> Carregar PDF
+              </Label>
+            </Button>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="installationNumber">Numero da instalação</Label>
@@ -230,21 +245,7 @@ export function ExtractInvoiceModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="w-full">
-              <Label htmlFor="pdfFile" className="sr-only">
-                Carregar PDF
-              </Label>
-              <Input
-                id="pdfFile"
-                type="file"
-                accept="application/pdf"
-                {...register("pdfFile", { required: "Este campo é obrigatório" })}
-                className="rounded-md cursor-pointer"
-                onChange={handlePdfUpload}
-              />
-              {errors.pdfFile && <p className="text-red-500 text-sm">{errors.pdfFile.message}</p>}
-              <p className="text-sm text-muted-foreground">Carregue o arquivo PDF da fatura.</p>
-            </div>
+            <div className="w-full"></div>
             <Button type="submit" className="rounded-md w-full">
               Cadastrar Fatura
             </Button>
