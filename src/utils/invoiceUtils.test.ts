@@ -1,38 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  processInvoiceData,
-  calculateInvoiceData,
-  INITIAL_ENERGY_DATA,
-  INITIAL_MONETARY_DATA,
-} from "./invoiceUtils";
-
-export type Invoice = {
-  id: string;
-  consumer: string;
-  distributor: string;
-  invoiceMonth: string;
-  installationNumber: string;
-  clientNumber: string;
-  energyValue: string;
-  energyQuantity: string;
-  sceeeValue: string;
-  sceeeQuantity: string;
-  compensatedValue: string;
-  compensatedQuantity: string;
-  publicLighting: string;
-  invoiceUrl: string;
-  invoiceName: string;
-  createdAt: string;
-  updatedAt: string;
-};
+import { processInvoiceData, calculateInvoiceData, INITIAL_ENERGY_DATA, INITIAL_MONETARY_DATA } from "./invoiceUtils";
+import { Invoice } from "@/types/types";
 
 describe("processInvoiceData", () => {
-  let setEnergyData: React.Dispatch<
-    React.SetStateAction<typeof INITIAL_ENERGY_DATA>
-  >;
-  let setMonetaryData: React.Dispatch<
-    React.SetStateAction<typeof INITIAL_MONETARY_DATA>
-  >;
+  let setEnergyData: React.Dispatch<React.SetStateAction<typeof INITIAL_ENERGY_DATA>>;
+  let setMonetaryData: React.Dispatch<React.SetStateAction<typeof INITIAL_MONETARY_DATA>>;
   let setTotalEnergy: React.Dispatch<React.SetStateAction<number>>;
   let setTotalCompensated: React.Dispatch<React.SetStateAction<number>>;
   let setTotalWithoutGD: React.Dispatch<React.SetStateAction<number>>;
@@ -47,7 +19,7 @@ describe("processInvoiceData", () => {
     setTotalEconomyGD = vi.fn();
   });
 
-  it("should process invoice data correctly", () => {
+  it("deve processar os dados da fatura corretamente", () => {
     const invoices: Invoice[] = [
       {
         id: "1",
@@ -117,7 +89,7 @@ describe("processInvoiceData", () => {
     expect(setTotalEconomyGD).toHaveBeenCalledWith(60);
   });
 
-  it("should handle empty invoices array", () => {
+  it("deve lidar com array de faturas vazio", () => {
     const invoices: Invoice[] = [];
 
     processInvoiceData(
@@ -140,7 +112,7 @@ describe("processInvoiceData", () => {
 });
 
 describe("calculateInvoiceData", () => {
-  it("should calculate invoice data correctly", () => {
+  it("deve calcular os dados da fatura corretamente", () => {
     const invoices: Invoice[] = [
       {
         id: "1",
