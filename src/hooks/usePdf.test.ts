@@ -1,6 +1,6 @@
-import { pdfData } from "../utils/constantTestPdf";
-import { extractRelevantData } from "./usePdf";
 import { vi } from "vitest";
+import { extractRelevantData } from "./usePdf";
+import { pdfData } from "../utils/constantTestPdf";
 
 vi.mock("pdfjs-dist", () => {
   return {
@@ -20,7 +20,7 @@ vi.mock("pdfjs-dist", () => {
 });
 
 describe("extractRelevantData", () => {
-  it("should extract relevant data from the given array", () => {
+  it("deve extrair dados relevantes do array fornecido", () => {
     const result = extractRelevantData(pdfData);
 
     expect(result).toEqual({
