@@ -1,42 +1,41 @@
-import * as pdfjs from "pdfjs-dist";
-import fs from "fs";
-import path from "path";
-import { extractTextFromFile } from "@/hooks/usePdf";
+import { pdfData } from "../utils/constantTestPdf";
+import { extractRelevantData } from "./usePdf";
+import { vi } from "vitest";
 
-// Configurar o workerSrc
-pdfjs.GlobalWorkerOptions.workerSrc =
-  "../../node_modules/pdfjs-dist/build/pdf.worker.min.mjs";
+vi.mock("pdfjs-dist", () => {
+  return {
+    GlobalWorkerOptions: {
+      workerSrc: "",
+    },
+    getDocument: () => ({
+      promise: Promise.resolve({
+        getPage: () => ({
+          getTextContent: () => ({
+            items: [],
+          }),
+        }),
+      }),
+    }),
+  };
+});
 
-describe("extractTextFromFile", () => {
-  it("should extract text from a real PDF file", async () => {
-    // Caminho para o arquivo PDF de teste
-    const pdfPath = path.resolve(__dirname, "__mocks__/test.pdf");
+describe("extractRelevantData", () => {
+  it("should extract relevant data from the given array", () => {
+    const result = extractRelevantData(pdfData);
 
-    // Ler o conteúdo do PDF como um Buffer
-    const pdfBuffer = fs.readFileSync(pdfPath);
-
-    // Criar um objeto File para simular o envio de arquivo (caso necessário)
-    const mockPdfFile = new File([pdfBuffer], "test.pdf", {
-      type: "application/pdf",
-    });
-
-    // Chamar a função real que extrai o texto do arquivo PDF
-    const result = await extractTextFromFile(mockPdfFile);
-
-    // Verificar o resultado da extração (ajustar de acordo com o conteúdo do PDF de teste)
     expect(result).toEqual({
-      distributor: "CEP",
-      installationNumber: "987654",
-      consumer: "ABC",
-      clientNumber: "12345",
-      invoiceMonth: "Janeiro 2024",
-      publicLighting: "R$ 5,00",
-      energyValue: "R$ 150,00",
-      energyQuantity: "300 kWh",
-      sceeeValue: "R$ 30,00",
-      sceeeQuantity: "0",
-      compensatedValue: "R$ 20,00",
-      compensatedQuantity: "0",
+      clientNumber: "7202210726",
+      compensatedQuantity: "2.300",
+      compensatedValue: "-1.120,85",
+      consumer: "SELFWAY TREINAMENTO PERSONALIZADO LTDA",
+      distributor: "CEMIG DISTRIBUIÇÃO S.A. CNPJ 06.981.180/0001-16 / INSC. ESTADUAL 062.322136.0087.",
+      energyQuantity: "100",
+      energyValue: "95,52",
+      installationNumber: "7202210726",
+      invoiceMonth: "JAN/2024",
+      publicLighting: "40,45",
+      sceeeQuantity: "2.300",
+      sceeeValue: "1.172,31",
     });
   });
 });
