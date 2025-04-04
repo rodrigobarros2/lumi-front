@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExtractInvoiceModal } from "./modal";
 import { Header } from "@/components/Header";
 import { getAllInvoices } from "@/modules/invoices";
@@ -27,14 +21,17 @@ export function Invoices() {
       const response = await getAllInvoices();
       const data = response.data as Invoice[];
 
-      const filtered = data.filter(
-        (invoice) =>
-          new Date(invoice.createdAt).getFullYear().toString() === year &&
-          (invoice.consumer
-            .toLowerCase()
-            .includes(debouncedFilter.toLowerCase()) ||
-            String(invoice.clientNumber).includes(debouncedFilter))
-      );
+      const filtered = data.filter((invoice) => {
+        const invoiceYear = invoice.invoiceMonth.split("/")[1];
+        const matchesYear = invoiceYear === year;
+
+        const matchesFilter =
+          invoice.consumer.toLowerCase().includes(debouncedFilter.toLowerCase()) ||
+          String(invoice.clientNumber).includes(debouncedFilter);
+
+        return matchesYear && matchesFilter;
+      });
+
       setInvoices(data);
       setFilteredInvoices(filtered);
     } catch (error) {
