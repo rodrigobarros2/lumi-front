@@ -53,13 +53,13 @@ export function Invoices() {
           placeholder="Filtrar por número do cliente ou nome..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="max-w-[330px] mr-4"
+          className="max-w-[300px] mr-4"
         />
 
         <div className="flex">
           <ExtractInvoiceModal onClose={fetchAndFilterInvoices} />
           <Select value={year} onValueChange={(value) => setYear(value)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[90px]">
               <SelectValue placeholder="Selecione o ano" />
             </SelectTrigger>
             <SelectContent>

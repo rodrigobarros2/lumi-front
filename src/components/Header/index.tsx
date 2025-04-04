@@ -16,7 +16,11 @@ export function Header() {
     <div className="bg-background text-foreground">
       <header className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
-          <BatteryCharging className="w-4 h-4 text-green-500" />
+          <img
+            src={theme === "dark" ? "/src/assets/logo.svg" : "/src/assets/logo-black.svg"}
+            alt="Logo"
+            className="w-16 mr-3"
+          />
           <nav>
             <ul className="flex space-x-4">
               <li>

@@ -52,13 +52,13 @@ export function Home() {
     <div className="min-h-screen bg-background text-foreground p-6">
       <Header />
       <main>
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 gap-4">
           <h2 className="text-2xl font-bold">Dashboard</h2>
 
           <div className="relative">
             <Select value={selectedClient} onValueChange={setSelectedClient}>
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Selecione um número do cliente" />
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Número do cliente" />
               </SelectTrigger>
               <SelectContent>
                 {clients.map((clientNumber) => (
