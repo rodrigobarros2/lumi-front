@@ -1,4 +1,4 @@
-import { Sun, Moon, BatteryCharging } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { DropdownMenu } from "../ui/dropdown-menu";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "../theme-provider";
