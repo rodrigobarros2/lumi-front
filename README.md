@@ -6,8 +6,6 @@
 
 Interface de usuário para o sistema de processamento e análise de faturas de energia elétrica da Lumi.
 
-![Dashboard Preview](./docs/images/dashboard-preview.png)
-
 ## 🚀 Configuração e Execução
 
 ### Pré-requisitos
